@@ -1,9 +1,49 @@
 import sys, time
 from PyQt5 import QtWidgets, QtCore
+from MainClockWindow import Ui_MainClockWindow
 from RecordingWindow import Ui_RecordingWindow
 import speech_recognition as sr
 #TASKS:
+#MainClockApp -> LCD bar fills up as the seconds or time go up
 #RecorderApp: Convert Print statements to visuals
+
+class MainClockApp(QtWidgets.QMainWindow):
+    def  __init__(self):
+        super().__init__()
+        self.ui = Ui_MainClockWindow()
+        self.ui.setupUi(self)  #setupUi takes the python file converted from .ui and builds all the widgest and layouts 
+
+        timer = QtCore.QTimer(self)
+        timer.timeout.connect(self.update_clock)
+        timer.start(1000) #update every second (in ms)
+
+
+    def update_clock(self):
+        #using strftime to grab the date since it formats it already
+        date = time.strftime("%A, %B %d, %Y") #Gives Date in Format of; Monday, August 17, 2025
+        self.ui.textBrowser.setText(date)
+
+        #grabbing a struct_time object so I can change the number on each of the lcd display (Hour, Minute, Second)
+        now = time.localtime()
+        hour = now.tm_hour
+        minute = now.tm_min
+        second = now.tm_sec
+        self.ui.lcdNumber.display(hour)
+        self.ui.lcdNumber_2.display(minute)
+        self.ui.lcdNumber_3.display(second)
+
+        #Total seconds passed / Seconds in a total day  -> x 100 (for percentage)
+        percentageOfDayDone = (((hour*60*60) + (minute * 60) + (second))) / (24*60*60) * 100
+        self.ui.progressBar.setValue(int(percentageOfDayDone))
+
+
+        print(f"Time Updated: {hour} : {minute} : {second} - {percentageOfDayDone} % completed")
+
+
+
+
+
+    
 
 
 class RecorderApp(QtWidgets.QMainWindow):
@@ -65,7 +105,7 @@ class RecorderApp(QtWidgets.QMainWindow):
 
         self.ui.textBrowser.clear()
 
-        
+
     # runs in a background thread → DO NOT touch UI directly here
     def _callback(self, recog, audio):
         try:
@@ -95,6 +135,5 @@ class RecorderApp(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    w = RecorderApp()
-    w.show()
+    MainClockApp().show()
     sys.exit(app.exec_())
