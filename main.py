@@ -1,10 +1,15 @@
-import sys
+import sys, time
 from PyQt5 import QtWidgets, QtCore
 from RecordingWindow import Ui_RecordingWindow
 import speech_recognition as sr
+#TASKS:
+#RecorderApp: Convert Print statements to visuals
+
 
 class RecorderApp(QtWidgets.QMainWindow):
-    sigText = QtCore.pyqtSignal(str)
+    #We send and create using signals to prevent crashing/error from directly updating the UI from thread
+    #Signal sends messages safely from worker thread to the GUI thread
+    sigText = QtCore.pyqtSignal(str) 
     sigErr  = QtCore.pyqtSignal(str)
 
     def __init__(self):
@@ -22,6 +27,11 @@ class RecorderApp(QtWidgets.QMainWindow):
         self.ui.pushButton.setText("Hold to Record")
         self.ui.pushButton.pressed.connect(self.start_listening)
         self.ui.pushButton.released.connect(self.stop_listening)
+
+
+        #STYLING
+        self.ui.textBrowser.setStyleSheet("font-size: 16pt; font-family: Arial;")
+
 
     def start_listening(self):
         if self._stopper:  # already running
@@ -47,8 +57,15 @@ class RecorderApp(QtWidgets.QMainWindow):
             self._stopper(wait_for_stop=False)
             self._stopper = None
         self._bg_mic = None
+
+
+        time.sleep(10) #add a delay for messages to be processed before saving
+        self.save_recorded_message()
         self.ui.pushButton.setText("Hold to Record")
 
+        self.ui.textBrowser.clear()
+
+        
     # runs in a background thread → DO NOT touch UI directly here
     def _callback(self, recog, audio):
         try:
@@ -59,6 +76,22 @@ class RecorderApp(QtWidgets.QMainWindow):
             pass
         except sr.RequestError as e:
             self.sigErr.emit(f"Recognizer error: {e}")
+
+    def save_recorded_message(self):
+        text = self.ui.textBrowser.toPlainText()
+        currentTime = time.strftime("%H:%M:%S") #uses internal system clock (so it'll work even without device connected  to wifi)
+        print(f'saving {text} at {currentTime}')
+        
+        with open("recordingLog.txt", "a", encoding="utf-8") as file: #a -> append
+            file.write(f"{currentTime} : {text}")
+
+
+
+            
+
+
+
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
