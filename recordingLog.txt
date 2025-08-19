@@ -3,4 +3,5 @@ so hi15:46:21 : SAMPLE TEXT:
 so hi
 self-explanatory I guess15:52:59 : SAMPLE TEXT:15:53:10 : SAMPLE TEXT:15:53:20 : SAMPLE TEXT:15:53:37 : SAMPLE TEXT:
 hello15:57:48 : 15:58:20 : SAMPLE TEXT:15:58:40 : hello hello just testing my17:14:51 : SAMPLE TEXT:
-no it's 12:00 it's currently 12:00
+no it's 12:00 it's currently 12:0017:17:03 : SAMPLE TEXT:
+is testing testing testing
