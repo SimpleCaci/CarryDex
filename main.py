@@ -7,6 +7,10 @@ import speech_recognition as sr
 #MainClockApp -> LCD bar fills up as the seconds or time go up
 #RecorderApp: Convert Print statements to visuals
 
+
+
+
+
 class MainClockApp(QtWidgets.QMainWindow):
     def  __init__(self):
         super().__init__()
@@ -130,7 +134,32 @@ class RecorderApp(QtWidgets.QMainWindow):
 
 
 
-            
+
+
+class Root(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.stack = QtWidgets.QStackedWidget()
+        self.setCentralWidget(self.stack)
+
+        self.clock = MainClockApp()
+        self.rec   = RecorderApp()
+
+        # use their central widgets inside the stack
+        self.stack.addWidget(self.clock.centralWidget())
+        self.stack.addWidget(self.rec.centralWidget())
+        self.stack.setCurrentIndex(0)
+
+        # shortcuts
+        QtWidgets.QShortcut("F1", self, activated=lambda: self.stack.setCurrentIndex(0))
+        QtWidgets.QShortcut("F2", self, activated=lambda: self.stack.setCurrentIndex(1))
+
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    w = Root()
+    w.resize(900, 600)
+    w.show()
+    sys.exit(app.exec_())
 
 
 
@@ -138,6 +167,6 @@ class RecorderApp(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    w = MainClockApp()
+    w = Root()
     w.show() #creating a variable to make sure it's not garbage collected
     sys.exit(app.exec_())
