@@ -6,7 +6,7 @@ import speech_recognition as sr
 
 import math
 from PyQt5.QtCore import Qt, QPropertyAnimation, pyqtProperty, QPoint, QTimer
-from PyQt5.QtGui import QPainter, QBrush
+from PyQt5.QtGui import QPainter, QBrush, QColor
 from PyQt5.QtWidgets import QWidget
 
 from PyQt5.QtWidgets import QWidget, QStackedWidget, QApplication, QVBoxLayout, QPushButton, QLabel
@@ -16,7 +16,7 @@ import sys
 
 
 
-from radical_transition import RadialTransition
+from radial_transition import RadialTransition
 #TASKS:
 #MainClockApp -> LCD bar fills up as the seconds or time go up
 #RecorderApp: Convert Print statements to visuals
@@ -179,6 +179,7 @@ class Root(QtWidgets.QMainWindow):
         if not self.stack.rect().contains(pos):
             pos = None
 
+        self.transition.raise_() 
         # To go to a new page with a radial transition
         self.transition.start(
             center=QPoint(self.width()//2, self.height()//2),
