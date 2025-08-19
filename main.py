@@ -3,6 +3,11 @@ from PyQt5 import QtWidgets, QtCore
 from MainClockWindow import Ui_MainClockWindow
 from RecordingWindow import Ui_RecordingWindow
 import speech_recognition as sr
+
+from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import pyqtProperty, QEasingCurve
+
+from radical_transition import RadialTransition
 #TASKS:
 #MainClockApp -> LCD bar fills up as the seconds or time go up
 #RecorderApp: Convert Print statements to visuals
@@ -103,7 +108,7 @@ class RecorderApp(QtWidgets.QMainWindow):
         self._bg_mic = None
 
 
-        QtCore.QTimer.singleShot(1000, self.save_and_clear()) #prevents UI from being blocked up, wait 1s for last callback (Better than using sleep)
+        QtCore.QTimer.singleShot(1000, self.save_and_clear) #prevents UI from being blocked up, wait 1s for last callback (Better than using sleep)
 
         self.ui.pushButton.setText("Hold to Record")
 
@@ -126,7 +131,7 @@ class RecorderApp(QtWidgets.QMainWindow):
         print(f'saving {text} at {currentTime}')
         
         with open("recordingLog.txt", "a", encoding="utf-8") as file: #a -> append
-            file.write(f"{currentTime} : {text}")
+            file.write(f"/n {currentTime} : {text}")
 
     def save_and_clear(self):
         self.save_recorded_message()
@@ -145,27 +150,35 @@ class Root(QtWidgets.QMainWindow):
         self.clock = MainClockApp()
         self.rec   = RecorderApp()
 
-        # use their central widgets inside the stack
+        # add their central widgets inside the stack
         self.stack.addWidget(self.clock.centralWidget())
         self.stack.addWidget(self.rec.centralWidget())
         self.stack.setCurrentIndex(0)
 
-        # shortcuts
-        QtWidgets.QShortcut("F1", self, activated=lambda: self.stack.setCurrentIndex(0))
-        QtWidgets.QShortcut("F2", self, activated=lambda: self.stack.setCurrentIndex(1))
+        # transition effect
+        self.transition = RadialTransition(self.stack)
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    w = Root()
-    w.resize(900, 600)
-    w.show()
-    sys.exit(app.exec_())
+        # shortcuts to switch with transition
+        QtWidgets.QShortcut("F1", self, activated=lambda: self.radial_to(0))
+        QtWidgets.QShortcut("F2", self, activated=lambda: self.radial_to(1))
 
+    def radial_to(self, next_index):
+        # choose mouse pos as center if inside widget, otherwise center
+        pos = self.stack.mapFromGlobal(QtGui.QCursor.pos())
+        if not self.stack.rect().contains(pos):
+            pos = None
 
+        self.transition.start(
+            center=pos,
+            duration=350,
+            reverse=False
+        )
 
-
-
-
+        self.transition.start(
+            center=pos,
+            duration=350,
+            reverse=True
+        )
 
 
 if __name__ == "__main__":
