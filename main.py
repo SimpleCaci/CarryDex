@@ -99,11 +99,10 @@ class RecorderApp(QtWidgets.QMainWindow):
         self._bg_mic = None
 
 
-        time.sleep(10) #add a delay for messages to be processed before saving
-        self.save_recorded_message()
+        QtCore.QTimer.singleShot(1000, self.save_and_clear()) #prevents UI from being blocked up, wait 1s for last callback (Better than using sleep)
+
         self.ui.pushButton.setText("Hold to Record")
 
-        self.ui.textBrowser.clear()
 
 
     # runs in a background thread → DO NOT touch UI directly here
@@ -125,6 +124,10 @@ class RecorderApp(QtWidgets.QMainWindow):
         with open("recordingLog.txt", "a", encoding="utf-8") as file: #a -> append
             file.write(f"{currentTime} : {text}")
 
+    def save_and_clear(self):
+        self.save_recorded_message()
+        self.ui.textBrowser.clear()
+
 
 
             
@@ -135,5 +138,6 @@ class RecorderApp(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    MainClockApp().show()
+    w = MainClockApp()
+    w.show() #creating a variable to make sure it's not garbage collected
     sys.exit(app.exec_())
