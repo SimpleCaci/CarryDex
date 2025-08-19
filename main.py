@@ -1,16 +1,26 @@
 import sys, time
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from MainClockWindow import Ui_MainClockWindow
 from RecordingWindow import Ui_RecordingWindow
 import speech_recognition as sr
 
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import pyqtProperty, QEasingCurve
+import math
+from PyQt5.QtCore import Qt, QPropertyAnimation, pyqtProperty, QPoint, QTimer
+from PyQt5.QtGui import QPainter, QBrush
+from PyQt5.QtWidgets import QWidget
+
+from PyQt5.QtWidgets import QWidget, QStackedWidget, QApplication, QVBoxLayout, QPushButton, QLabel
+from PyQt5.QtCore import Qt, QTimer, QPoint
+from PyQt5.QtGui import QRegion
+import sys
+
+
 
 from radical_transition import RadialTransition
 #TASKS:
 #MainClockApp -> LCD bar fills up as the seconds or time go up
 #RecorderApp: Convert Print statements to visuals
+#Fix my importations to not make it repeat
 
 
 
@@ -147,38 +157,42 @@ class Root(QtWidgets.QMainWindow):
         self.stack = QtWidgets.QStackedWidget()
         self.setCentralWidget(self.stack)
 
+        
+
         self.clock = MainClockApp()
         self.rec   = RecorderApp()
 
         # add their central widgets inside the stack
-        self.stack.addWidget(self.clock.centralWidget())
-        self.stack.addWidget(self.rec.centralWidget())
+        self.stack.addWidget(self.clock)
+        self.stack.addWidget(self.rec)
         self.stack.setCurrentIndex(0)
 
         # transition effect
         self.transition = RadialTransition(self.stack)
 
         # shortcuts to switch with transition
-        QtWidgets.QShortcut("F1", self, activated=lambda: self.radial_to(0))
-        QtWidgets.QShortcut("F2", self, activated=lambda: self.radial_to(1))
+        QtWidgets.QShortcut("F1", self, activated=lambda: self.radial_to(self.clock))
+        QtWidgets.QShortcut("F2", self, activated=lambda: self.radial_to(self.rec))
 
-    def radial_to(self, next_index):
-        # choose mouse pos as center if inside widget, otherwise center
+    def radial_to(self, next):
         pos = self.stack.mapFromGlobal(QtGui.QCursor.pos())
         if not self.stack.rect().contains(pos):
             pos = None
 
+        # To go to a new page with a radial transition
         self.transition.start(
-            center=pos,
-            duration=350,
-            reverse=False
+            center=QPoint(self.width()//2, self.height()//2),
+            duration=600,
+            reverse=False,
+            mid_callback=lambda: self.stack.setCurrentWidget(next),  # switch page at max circle
+            finished_callback=lambda: self.transition.start(
+                center=QPoint(self.width()//2, self.height()//2),
+                duration=600,
+                reverse=True
+            )
         )
 
-        self.transition.start(
-            center=pos,
-            duration=350,
-            reverse=True
-        )
+
 
 
 if __name__ == "__main__":
