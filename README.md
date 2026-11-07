@@ -1,44 +1,28 @@
 # CarryDex
 
-A PyQt desktop experiment that combines a day-progress clock with push-to-talk speech notes and an animated transition between tools.
+A PyQt desktop prototype that switches between a day-progress clock and push-to-talk speech notes with a radial transition.
 
-## Tech stack
+## Run
 
-- Python
-- PyQt5 and Qt Designer UI files
-- SpeechRecognition
-- System microphone input
-
-## Features
-
-- Live hour, minute, and second display.
-- Progress indicator for the percentage of the current day completed.
-- Hold-to-record speech recognition view.
-- Local timestamped note log.
-- Keyboard switching between clock and recorder with a radial transition.
-
-## Run locally
+Create and activate a Python virtual environment, then:
 
 ```bash
-python -m venv .venv
-# activate the environment
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 python main.py
 ```
 
-PyAudio may require an OS-specific wheel or PortAudio package. Press `F1` for the clock and `F2` for the recorder.
+Press **F1** for the clock and **F2** for the recorder. PyAudio may require PortAudio or a compatible OS-specific wheel.
 
-## Status
+## What works
 
-Useful desktop prototype. The UI and core flows are implemented, while microphone behavior depends on local audio hardware and the Google recognition service.
+- Live time and percentage of the current day completed.
+- Hold-to-record speech recognition and timestamped local note logs.
+- Keyboard switching between the two tools.
 
-## Repository maintenance
+Microphone behavior depends on local hardware and the Google recognition service. Speech is sent to that service; use non-sensitive test phrases.
 
-## Next steps
+## Next
 
-- Correct log newline formatting and add explicit save feedback.
-- Consolidate repeated imports.
-- Add offline recognition as an optional backend.
-- Test the non-audio clock logic independently.
+Fix log newline formatting, add save feedback, and test clock calculations independently from audio. Offline recognition would make a useful later milestone.
 
 Built by [SimpleCaci](https://github.com/SimpleCaci).
